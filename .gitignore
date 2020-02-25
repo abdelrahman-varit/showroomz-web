@@ -1,0 +1,34 @@
+/public/hot
+/public/storage
+/public/css
+/public/js
+/public/vendor
+/public/themes
+/public/fonts
+storage/
+storage/*.key
+/node_modules
+/vendor
+/resources/themes/velocity/*
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+npm-debug.log
+yarn-error.log
+.env
+/ignorables/*
+
+#development env files should be ignored globally
+/.idea
+/.vscode
+/.vagrant
+Homestead.json
+Homestead.yaml
+/docker-compose-collection
+.php_cs.cache
+/docker-compose-collection/
+/bin
+*.pem
