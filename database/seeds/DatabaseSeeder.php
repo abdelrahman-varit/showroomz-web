@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use Webkul\Velocity\Database\Seeders\VelocityMetaDataSeeder;
-use Webkul\Admin\Database\Seeders\DatabaseSeeder as BagistoDatabaseSeeder;
+use Showroomz\Admin\Database\Seeders\DatabaseSeeder as ShowroomzDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(BagistoDatabaseSeeder::class);
+        $this->call(ShowroomzDatabaseSeeder::class);
         $this->call(VelocityMetaDataSeeder::class);
     }
 }

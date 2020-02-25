@@ -102,7 +102,10 @@
         "Webkul\\CartRule\\": "packages/Webkul/CartRule/src",
         "Webkul\\Rule\\": "packages/Webkul/Rule/src",
         "Webkul\\CMS\\": "packages/Webkul/CMS/src",
-        "Webkul\\Velocity\\": "packages/Webkul/Velocity/src"
+        "Webkul\\Velocity\\": "packages/Webkul/Velocity/src",
+        "Showroomz\\User\\": "packages/Showroomz/User/src",
+        "Showroomz\\Admin\\": "packages/Showroomz/Admin/src",
+        "Showroomz\\Core\\": "packages/Showroomz/Core/src"
       }
     },
 
