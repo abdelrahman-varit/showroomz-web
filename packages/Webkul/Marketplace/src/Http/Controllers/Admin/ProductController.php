@@ -7,6 +7,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 use Webkul\Marketplace\Repositories\ProductRepository;
 use Webkul\Marketplace\Mail\ProductApprovalNotification;
+use Webkul\Marketplace\Mail\ProductDisapprovalNotification;
+
 
 /**
  * Admin Product Controller
@@ -119,6 +121,12 @@ class ProductController extends Controller
                 if ($data['update-options']) {
                     try {
                         Mail::send(new ProductApprovalNotification($sellerProduct));
+                    } catch (\Exception $e) {
+
+                    }
+                } else {
+                    try {
+                        Mail::send(new ProductDisapprovalNotification($sellerProduct));
                     } catch (\Exception $e) {
 
                     }

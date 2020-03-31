@@ -113,7 +113,7 @@ class OrderRepository extends Repository
     {
         $order = $data['order'];
 
-        Event::fire('marketplace.sales.order.save.before', $data);
+        Event::dispatch('marketplace.sales.order.save.before', $data);
 
         $sellerOrders = [];
 
@@ -164,10 +164,10 @@ class OrderRepository extends Repository
 
             $commission = $baseCommission = 0;
             $sellerTotal = $baseSellerTotal = 0;
-            if ($commissionPercentage) {
+
+            if (isset($commissionPercentage)) {
                 $commission = ($item->total * $commissionPercentage) / 100;
                 $baseCommission = ($item->base_total * $commissionPercentage) / 100;
-
                 $sellerTotal = $item->total - $commission;
                 $baseSellerTotal = $item->base_total - $baseCommission;
             }
@@ -198,9 +198,11 @@ class OrderRepository extends Repository
         }
 
         foreach ($sellerOrders as $order) {
+            $order->sellerCount = count($sellerOrders);
+
             $this->collectTotals($order);
 
-            Event::fire('marketplace.sales.order.save.after', $order);
+            Event::dispatch('marketplace.sales.order.save.after', $order);
         }
 
         session()->forget('marketplace_shipping_rates');
@@ -217,11 +219,11 @@ class OrderRepository extends Repository
         $sellerOrders = $this->findWhere(['order_id' => $order->id]);
 
         foreach ($sellerOrders as $sellerOrder) {
-            Event::fire('marketplace.sales.order.cancel.before', $sellerOrder);
+            Event::dispatch('marketplace.sales.order.cancel.before', $sellerOrder);
 
             $this->updateOrderStatus($sellerOrder);
 
-            Event::fire('marketplace.sales.order.cancel.after', $sellerOrder);
+            Event::dispatch('marketplace.sales.order.cancel.after', $sellerOrder);
         }
     }
 
@@ -244,7 +246,7 @@ class OrderRepository extends Repository
             if (! $sellerOrder->canCancel())
                 return false;
 
-            Event::fire('marketplace.sales.order.cancel.before', $sellerOrder);
+            Event::dispatch('marketplace.sales.order.cancel.before', $sellerOrder);
 
             foreach ($sellerOrder->items as $item) {
                 if ($item->item->qty_to_cancel) {
@@ -263,7 +265,7 @@ class OrderRepository extends Repository
             if ($result)
                 $sellerOrder->order->update(["status" => "canceled"]);
 
-            Event::fire('marketplace.sales.order.cancel.after', $sellerOrder);
+            Event::dispatch('marketplace.sales.order.cancel.after', $sellerOrder);
 
             return true;
         }
@@ -386,20 +388,17 @@ class OrderRepository extends Repository
             && isset($marketplaceShippingRates[$carrier][$shippingMethod])
             && isset($marketplaceShippingRates[$carrier][$shippingMethod][$order->marketplace_seller_id])) {
             $sellerShippingRate = $marketplaceShippingRates[$carrier][$shippingMethod][$order->marketplace_seller_id];
-
             $order->shipping_amount = $sellerShippingRate['amount'];
             $order->base_shipping_amount = $sellerShippingRate['base_amount'];
         }
 
         foreach ($order->items()->get() as $sellerOrderItem) {
-
             $item = $sellerOrderItem->item;
-
             $order->discount_amount += $item->discount_amount;
             $order->base_discount_amount += $item->base_discount_amount;
-            $order->grand_total = $item->total + $item->tax_amount - $item->discount_amount;
+            $order->grand_total += $item->total + $item->tax_amount - $item->discount_amount;
 
-            $order->base_grand_total = $item->base_total + $item->base_tax_amount - $item->base_discount_amount;
+            $order->base_grand_total += $item->base_total + $item->base_tax_amount - $item->base_discount_amount;
 
             $order->sub_total += $item->total;
             $order->base_sub_total += $item->base_total;
@@ -419,11 +418,14 @@ class OrderRepository extends Repository
         }
 
         if ($order->shipping_amount > 0) {
-            $order->grand_total += $order->shipping_amount;
-            $order->base_grand_total += $order->base_shipping_amount;
+            $order->grand_total += $order->shipping_amount/$order->sellerCount;
+            $order->base_grand_total += $order->base_shipping_amount/$order->sellerCount;
 
             $order->seller_total += $order->shipping_amount;
-            $order->base_seller_total += $order->base_shipping_amount;
+            $order->base_seller_total += $order->shipping_amount/$order->sellerCount;
+
+
+
         }
 
         $order->sub_total_invoiced = $order->base_sub_total_invoiced = 0;
@@ -450,7 +452,14 @@ class OrderRepository extends Repository
             $order->base_commission_invoiced += $baseCommissionInvoiced = ($invoice->base_sub_total * $order->commission_percentage) / 100;
 
             $order->seller_total_invoiced += $invoice->sub_total - $commissionInvoiced - $invoice->discount_amount + $invoice->shipping_amount + $invoice->tax_amount;
-            $order->base_seller_total_invoiced += $invoice->base_sub_total - $baseCommissionInvoiced - $invoice->base_discount_amount + $invoice->base_shipping_amount + $invoice->base_tax_amount;
+            $order->base_seller_total_invoiced += $invoice->base_sub_total - $baseCommissionInvoiced - $invoice->base_discount_amount + $invoice->base_shipping_amount/$order->sellerCount + $invoice->base_tax_amount;
+
+            $order->shipping_amount = $order->shipping_amount/$order->sellerCount;
+            $order->base_shipping_amount = $order->base_shipping_amount/$order->sellerCount;
+        }
+
+        if (isset($order->sellerCount)) {
+            unset($order->sellerCount);
         }
 
         $order->grand_total_invoiced = $order->sub_total_invoiced + $order->shipping_invoiced + $order->tax_amount_invoiced - $order->discount_amount_invoiced;

@@ -54,7 +54,7 @@ class OrderDataGrid extends DataGrid
                 ->leftJoin('orders', 'marketplace_orders.order_id', '=', 'orders.id')
                 ->leftJoin('marketplace_transactions', 'marketplace_orders.id', '=', 'marketplace_transactions.marketplace_order_id')
                 ->select('orders.id', 'marketplace_orders.order_id', 'marketplace_orders.base_sub_total', 'marketplace_orders.base_grand_total', 'marketplace_orders.base_commission', 'marketplace_orders.base_seller_total', 'marketplace_orders.base_seller_total_invoiced', 'marketplace_orders.created_at', 'marketplace_orders.status', 'is_withdrawal_requested', 'seller_payout_status', 'marketplace_orders.marketplace_seller_id', 'marketplace_orders.base_discount_amount')
-                ->addSelect(DB::raw('CONCAT(orders.customer_first_name, " ", orders.customer_last_name) as customer_name'))
+                ->addSelect(DB::raw('CONCAT(orders.customer_first_name, " ", orders.customer_last_name) as customer_name'), 'orders.increment_id')
                 ->addSelect(DB::raw('SUM(marketplace_transactions.base_total) as total_paid'))
                 ->groupBy('marketplace_orders.id');
 
@@ -82,7 +82,7 @@ class OrderDataGrid extends DataGrid
     public function addColumns()
     {
         $this->addColumn([
-            'index' => 'order_id',
+            'index' => 'increment_id',
             'label' => trans('marketplace::app.admin.orders.order-id'),
             'type' => 'number',
             'searchable' => false,

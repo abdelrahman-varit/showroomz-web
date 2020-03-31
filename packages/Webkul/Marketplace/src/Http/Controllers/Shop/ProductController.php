@@ -76,7 +76,7 @@ class ProductController extends Controller
     public function index($url)
     {
         $seller = $this->seller->findByUrlOrFail($url);
-        
+
         return view($this->_config['view'], compact('seller'));
     }
 
@@ -93,7 +93,7 @@ class ProductController extends Controller
         if ($product->type == 'configurable') {
             session()->flash('error', trans('shop::app.checkout.cart.integrity.missing_options'));
 
-            return redirect()->route('shop.products.index', ['slug' => $product->url_key]);
+            return redirect()->route('shop.productOrCategory.index', ['slug' => $product->url_key]);
         }
 
         return view($this->_config['view'], compact('product'));

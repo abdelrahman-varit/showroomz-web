@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Webkul\Marketplace\Http\Controllers\Shop\Controller;
 use Webkul\Product\Http\Requests\ProductForm;
-use Webkul\Product\Repositories\ProductRepository as Product;
+use Webkul\Marketplace\Repositories\MpProductRepository as Product;
 use Webkul\Attribute\Repositories\AttributeFamilyRepository as AttributeFamily;
 use Webkul\Category\Repositories\CategoryRepository as Category;
 use Webkul\Inventory\Repositories\InventorySourceRepository as InventorySource;
@@ -76,16 +76,15 @@ class ProductController extends Controller
      * @param  Webkul\Attribute\Repositories\AttributeFamilyRepository $attributeFamily
      * @param  Webkul\Category\Repositories\CategoryRepository         $category
      * @param  Webkul\Inventory\Repositories\InventorySourceRepository $inventorySource
-     * @param  Webkul\Product\Repositories\ProductRepository           $product
      * @param  Webkul\Marketplace\Repositories\ProductRepository       $sellerProduct
      * @param  Webkul\Marketplace\Repositories\SellerRepository        $seller
      * @return void
      */
     public function __construct(
+        Product $product,
         AttributeFamily $attributeFamily,
         Category $category,
         InventorySource $inventorySource,
-        Product $product,
         SellerProduct $sellerProduct,
         Seller $seller
     )
@@ -151,6 +150,7 @@ class ProductController extends Controller
         }
 
         if (request()->input('type') == 'configurable' && (! request()->has('super_attributes') || !count(request()->get('super_attributes')))) {
+
             session()->flash('error', 'Please select atleast one configurable attribute.');
 
             return back();
@@ -169,7 +169,7 @@ class ProductController extends Controller
                 'is_owner' => 1
             ]);
 
-        session()->flash('success', 'Product created successfully.');
+            session()->flash('success', 'Product created successfully.');
 
         return redirect()->route($this->_config['redirect'], ['id' => $product->id]);
     }
@@ -197,7 +197,9 @@ class ProductController extends Controller
 
         $product = $this->product->with(['variants', 'variants.inventories'])->findorFail($id);
 
-        $categories = $this->getVisibleCategoryTree(core()->getCurrentChannel()->root_category_id);
+        $categories = $this->category->getCategoryTree();
+
+        // $categories = $this->getVisibleCategoryTree(core()->getCurrentChannel()->root_category_id);
 
         $inventorySources = core()->getCurrentChannel()->inventory_sources;
 

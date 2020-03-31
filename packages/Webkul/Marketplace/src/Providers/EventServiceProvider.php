@@ -34,10 +34,19 @@ class EventServiceProvider extends ServiceProvider
             $viewRenderEventManager->addTemplate('marketplace::admin.layouts.style');
         });
 
-        Event::listen('bagisto.shop.layout.header.currency-item.before', function($viewRenderEventManager) {
-            $viewRenderEventManager->addTemplate('marketplace::shop.layouts.header.index');
-        });
+        if ( (core()->getCurrentChannel() && core()->getCurrentChannel()->theme == "velocity")) {
+            Event::listen('bagisto.shop.layout.head', function($viewRenderEventManager) {
+                $viewRenderEventManager->addTemplate('marketplace::shop.velocity.layouts.style');
+            });
 
+            Event::listen('bagisto.shop.layout.header.account-item.before', function($viewRenderEventManager) {
+                $viewRenderEventManager->addTemplate('marketplace::shop.layouts.header.index');
+            });
+        } else {
+            Event::listen('bagisto.shop.layout.header.currency-item.before', function($viewRenderEventManager) {
+                $viewRenderEventManager->addTemplate('marketplace::shop.layouts.header.index');
+            });
+        }
 
         Event::listen('customer.registration.after', 'Webkul\Marketplace\Listeners\Customer@registerSeller');
 
@@ -55,8 +64,17 @@ class EventServiceProvider extends ServiceProvider
 
         Event::listen('sales.order.cancel.after', 'Webkul\Marketplace\Listeners\Order@afterOrderCancel');
 
-        Event::listen('marketplace.seller.delete.after','Webkul\Marketplace\Listeners\Customer@afterSellerDelete');
+        Event::listen('catalog.marketplace.attribute.create.after', 'Webkul\Marketplace\Listeners\Product@afterAttributeCreatedUpdated');
 
+        Event::listen('catalog.marketplace.attribute.update.after', 'Webkul\Marketplace\Listeners\Product@afterAttributeCreatedUpdated');
+
+        Event::listen('catalog.marketplace.attribute.delete.before', 'Webkul\Marketplace\Listeners\Product@afterAttributeDeleted');
+
+        Event::listen('catalog.marketplace.product.create.after', 'Webkul\Marketplace\Listeners\Product@afterProductCreatedUpdated');
+
+        Event::listen('catalog.marketplace.product.update.after', 'Webkul\Marketplace\Listeners\Product@afterProductCreatedUpdated');
+
+        Event::listen('marketplace.seller.delete.after','Webkul\Marketplace\Listeners\Customer@afterSellerDelete');
 
         //Send sales mails
         Event::listen('marketplace.sales.order.save.after', 'Webkul\Marketplace\Listeners\Order@sendNewOrderMail');

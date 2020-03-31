@@ -123,8 +123,14 @@
                             <td style="padding: 10px;border-bottom: solid 1px #d3d3d3;color: #3a3a3a;vertical-align: top;">
                                 {{ $sellerOrderItem->item->name }}
 
-                                @if ($html = $sellerOrderItem->item->getOptionDetailHtml())
-                                    <p>{{ $html }}</p>
+                                @if (isset($sellerOrderItem->additional['attributes']))
+                                    <div class="item-options">
+
+                                        @foreach ($sellerOrderItem->additional['attributes'] as $attribute)
+                                            <b>{{ $attribute['attribute_name'] }} : </b>{{ $attribute['option_label'] }}</br>
+                                        @endforeach
+
+                                    </div>
                                 @endif
                             </td>
 

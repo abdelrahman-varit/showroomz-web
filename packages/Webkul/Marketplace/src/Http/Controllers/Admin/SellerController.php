@@ -151,7 +151,7 @@ class SellerController extends Controller
      */
     public function search($id)
     {
-        if (request()->ajax()) {
+        if (request()->input('query')) {
             $results = [];
 
             foreach ($this->sellerProduct->searchProducts(request()->input('query')) as $row) {
@@ -191,6 +191,12 @@ class SellerController extends Controller
         }
 
         $baseProduct = $this->product->find($productId);
+
+        if ($baseProduct->type != "simple" && $baseProduct->type != "configurable") {
+            session()->flash('error', $baseProduct->type.' product is not allowed to sell');
+
+            return redirect()->route('admin.marketplace.sellers.index');
+        }
 
         $inventorySources = core()->getCurrentChannel()->inventory_sources;
 

@@ -102,7 +102,9 @@ class SellerController extends Controller
 
         $seller = $this->seller->findOneByField('customer_id', auth()->guard('customer')->user()->id);
 
-        return view($this->_config['view'], compact('seller'));
+        return view($this->_config['view'], compact('seller'),
+            ['defaultCountry' => config('app.default_country')]
+        );
     }
 
     /**

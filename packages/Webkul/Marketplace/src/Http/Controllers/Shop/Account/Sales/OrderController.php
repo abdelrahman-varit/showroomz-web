@@ -89,6 +89,10 @@ class OrderController extends Controller
             'marketplace_seller_id' => $seller->id
         ]);
 
+        if (! $sellerOrder){
+            abort('404');
+        }
+
         return view($this->_config['view'], compact('sellerOrder'));
     }
 

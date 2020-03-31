@@ -5,6 +5,7 @@ namespace Webkul\Marketplace\Listeners;
 use Illuminate\Support\Facades\Mail;
 use Webkul\Marketplace\Repositories\SellerRepository;
 use Webkul\Marketplace\Repositories\ProductRepository;
+use Webkul\Product\Repositories\ProductRepository as CoreProductRepository;
 use Cart as CartFacade;
 
 /**
@@ -30,6 +31,14 @@ class Cart
     protected $productRepository;
 
     /**
+     * CoreProductRepository Object
+     */
+    protected $coreProductRepository;
+
+
+
+
+    /**
      * Create a new customer event listener instance.
      *
      * @param  Webkul\Marketplace\Repositories\SellerRepository  $sellerRepository
@@ -38,12 +47,15 @@ class Cart
      */
     public function __construct(
         SellerRepository $sellerRepository,
-        ProductRepository $productRepository
+        ProductRepository $productRepository,
+        CoreProductRepository $coreProductRepository
     )
     {
         $this->sellerRepository = $sellerRepository;
 
         $this->productRepository = $productRepository;
+
+        $this->coreProductRepository = $coreProductRepository;
     }
 
     /**
@@ -68,6 +80,7 @@ class Cart
                         'product_id' => $productId,
                         'is_owner' => 1
                     ]);
+
             }
         }
 
@@ -78,24 +91,26 @@ class Cart
         if (! isset($data['quantity']))
             $data['quantity'] = 1;
 
-        if ($cart = CartFacade::getCart()) {
-            $cartItem = $cart->items()->where('product_id', $sellerProduct->product_id)->first();
+        $product = $this->coreProductRepository->findOneByField('id', $productId);
 
-            if ($cartItem) {
-                if (!$sellerProduct->haveSufficientQuantity($data['quantity']))
-                    throw new \Exception('Requested quantity not available.');
+            if ($cart = CartFacade::getCart()) {
+                $cartItem = $cart->items()->where('product_id', $sellerProduct->product_id)->first();
 
-                $quantity = $cartItem->quantity + $data['quantity'];
+                if ($cartItem) {
+                    if (!$sellerProduct->haveSufficientQuantity($data['quantity']))
+                        throw new \Exception('Requested quantity not available.');
+
+                    $quantity = $cartItem->quantity + $data['quantity'];
+                } else {
+                    $quantity = $data['quantity'];
+                }
             } else {
                 $quantity = $data['quantity'];
             }
-        } else {
-            $quantity = $data['quantity'];
-        }
 
-        if (!$sellerProduct->haveSufficientQuantity($quantity)) {
-            throw new \Exception('Requested quantity not available.');
-        }
+            if (!$sellerProduct->haveSufficientQuantity($quantity)) {
+                throw new \Exception('Requested quantity not available.');
+            }
     }
 
     /**
@@ -105,25 +120,29 @@ class Cart
      */
     public function cartItemAddAfter($cartItem)
     {
-        if (isset($cartItem->additional['seller_info']) && !$cartItem->additional['seller_info']['is_owner']) {
-            $product = $this->productRepository->find($cartItem->additional['seller_info']['product_id']);
-            if ($product) {
-                $cartItem->price = core()->convertPrice($product->price);
-                $cartItem->base_price = $product->price;
-                $cartItem->custom_price = $product->price;
-                $cartItem->total = core()->convertPrice($product->price * $cartItem->quantity);
-                $cartItem->base_total = $product->price * $cartItem->quantity;
+        // dd($cartItem->items, $cartItem, "kjvg", $cartItem->additional['seller_info'], $cartItem->additional['seller_info']['is_owner']);
 
-                $cartItem->save();
+        foreach(CartFacade::getCart()->items as $items)
+        {
+            if (isset($items->additional['seller_info']) && !$items->additional['seller_info']['is_owner']) {
+                $product = $this->productRepository->find($items->additional['seller_info']['product_id']);
+
+                if ($product) {
+                    $items->price = core()->convertPrice($product->price);
+                    $items->base_price = $product->price;
+                    $items->custom_price = $product->price;
+                    $items->total = core()->convertPrice($product->price * $items->quantity);
+                    $items->base_total = $product->price * $items->quantity;
+
+                    $items->save();
+                }
+                $items->save();
             } else {
-                $cartItem->custom_price = NULL;
+                // $cartItem['custom_price'] = NULL;
+                $items->save();
             }
-
-            $cartItem->save();
-        } else {
-            $cartItem->custom_price = NULL;
-
-            $cartItem->save();
         }
+
+
     }
 }

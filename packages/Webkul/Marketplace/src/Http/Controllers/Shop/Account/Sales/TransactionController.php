@@ -84,9 +84,15 @@ class TransactionController extends Controller
         $seller = $this->sellerRepository->findOneByField('customer_id', auth()->guard('customer')->user()->id);
 
         $statistics = [
-            'total_sale' => $totalSale = $this->orderRepository->scopeQuery(function($query) use ($seller) {
+            'total_sale' =>
+                $totalSale = $this->orderRepository->scopeQuery(function($query) use($seller) {
                         return $query->where('marketplace_orders.marketplace_seller_id', $seller->id);
-                    })->sum('base_seller_total_invoiced'),
+                })->sum('base_seller_total') - $this->orderRepository->scopeQuery(function($query) use($seller) {
+                        return $query->where('marketplace_orders.marketplace_seller_id', $seller->id);
+                })->sum('base_grand_total_refunded') + $this->orderRepository->scopeQuery(function($query) use($seller) {
+                        return $query->where('marketplace_orders.marketplace_seller_id', $seller->id);
+                })->sum('base_commission_invoiced'),
+
 
             'total_payout' => $totalPaid = $this->transactionRepository->scopeQuery(function($query) use ($seller) {
                         return $query->where('marketplace_transactions.marketplace_seller_id', $seller->id);
@@ -106,7 +112,7 @@ class TransactionController extends Controller
      */
     public function view($id)
     {
-        $transaction = $this->transactionRepository->find($id);
+        $transaction = $this->transactionRepository->findOrFail($id);
 
         return view($this->_config['view'], compact('transaction'));
     }

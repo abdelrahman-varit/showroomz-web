@@ -103,7 +103,7 @@ class ProductRepository extends Repository
      */
     public function create(array $data)
     {
-        Event::fire('marketplace.catalog.product.create.before');
+        Event::dispatch('marketplace.catalog.product.create.before');
 
         $seller = $this->sellerRepository->findOneByField('customer_id', auth()->guard('customer')->user()->id);
 
@@ -122,7 +122,7 @@ class ProductRepository extends Repository
                 ]);
         }
 
-        Event::fire('marketplace.catalog.product.create.after', $sellerProduct);
+        Event::dispatch('marketplace.catalog.product.create.after', $sellerProduct);
 
         return $sellerProduct;
     }
@@ -133,7 +133,7 @@ class ProductRepository extends Repository
      */
     public function update(array $data, $id, $attribute = "id")
     {
-        Event::fire('marketplace.catalog.product.update.before', $id);
+        Event::dispatch('marketplace.catalog.product.update.before', $id);
 
         $sellerProduct = $this->find($id);
 
@@ -150,7 +150,7 @@ class ProductRepository extends Repository
             }
         }
 
-        Event::fire('marketplace.catalog.product.update.after', $sellerProduct);
+        Event::dispatch('marketplace.catalog.product.update.after', $sellerProduct);
 
         return $sellerProduct;
     }
@@ -160,7 +160,7 @@ class ProductRepository extends Repository
      */
     public function createAssign(array $data)
     {
-        Event::fire('marketplace.catalog.assign-product.create.before');
+        Event::dispatch('marketplace.catalog.assign-product.create.before');
 
         if (isset($data['seller_id']) && auth()->guard('admin')->user()) {
             $seller = $this->sellerRepository->findOneByField('id', $data['seller_id']);
@@ -197,7 +197,7 @@ class ProductRepository extends Repository
 
         $this->productImageRepository->uploadImages($data, $sellerProduct);
 
-        Event::fire('marketplace.catalog.assign-product.create.after', $sellerProduct);
+        Event::dispatch('marketplace.catalog.assign-product.create.after', $sellerProduct);
 
         return $sellerProduct;
     }
@@ -208,7 +208,7 @@ class ProductRepository extends Repository
      */
     public function updateAssign(array $data, $id, $attribute = "id")
     {
-        Event::fire('marketplace.catalog.assign-product.update.before', $id);
+        Event::dispatch('marketplace.catalog.assign-product.update.before', $id);
 
         $sellerProduct = $this->find($id);
 
@@ -268,7 +268,7 @@ class ProductRepository extends Repository
                 'vendor_id' => $sellerProduct->marketplace_seller_id
             ]), $sellerProduct->product);
 
-        Event::fire('marketplace.catalog.assign-product.update.after', $sellerProduct);
+        Event::dispatch('marketplace.catalog.assign-product.update.after', $sellerProduct);
 
         return $sellerProduct;
     }
@@ -476,7 +476,7 @@ class ProductRepository extends Repository
                         ->where('marketplace_products.is_owner', 0)
                         ->where('marketplace_products.is_approved', 1);
                         // ->where('marketplace_sellers.is_approved', 0);
-            })->count('id');
+            })->count();
     }
 
     /**

@@ -30,27 +30,45 @@ class MarketplaceServiceProvider extends ServiceProvider
 
         $this->loadTranslationsFrom(__DIR__ . '/../Resources/lang', 'marketplace');
 
+        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'marketplace');
+
         $this->publishes([
-            __DIR__ . '/../Resources/views/shop/customers/account/partials' => resource_path('views/vendor/shop/customers/account/partials'),
+            __DIR__ . '/../Resources/views/shop/default/customers/account/partials' => resource_path('themes/default/views/customers/account/partials'),
+        ]);
+
+        $this->publishes([
+            __DIR__ . '/../Resources/views/shop/default/sellers/products/add-buttons.blade.php' => resource_path('themes/default/views/products/add-buttons.blade.php'),
+        ]);
+
+        $this->publishes([
+            __DIR__ . '/../Resources/views/shop/default/sellers/products/price.blade.php' => resource_path('themes/default/views/products/price.blade.php'),
+        ]);
+
+        $this->publishes([
+            __DIR__ . '/../Resources/views/admin/customers/edit.blade.php' => resource_path('views/vendor/admin/customers/edit.blade.php'),
+        ]);
+
+        //velocity overrided file
+
+        $this->publishes([
+            __DIR__ . '/../Resources/views/shop/velocity/customers/account/partials' => resource_path('themes/velocity/views/customers/account/partials'),
         ]);
 
         $this->publishes([
             __DIR__ . '/../../publishable/assets' => public_path('themes/default/assets'),
         ], 'public');
 
-        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'marketplace');
-
         $this->publishes([
-            __DIR__ . '/../Resources/views/shop/sellers/products/add-buttons.blade.php' => resource_path('views/vendor/shop/products/add-buttons.blade.php'),
+            __DIR__ . '/../Resources/views/shop/velocity/sellers/products/add-buttons.blade.php' => resource_path('themes/velocity/views/products/add-buttons.blade.php'),
         ]);
 
         $this->publishes([
-            __DIR__ . '/../Resources/views/shop/sellers/products/price.blade.php' => resource_path('views/vendor/shop/products/price.blade.php'),
+            __DIR__ . '/../Resources/views/shop/velocity/sellers/products/price.blade.php' => resource_path('themes/velocity/views/products/price.blade.php'),
         ]);
 
         $this->publishes([
-            __DIR__ . '/../Resources/views/admin/customers/edit.blade.php' => resource_path('views/vendor/admin/customers/edit.blade.php'),
-        ]);
+            __DIR__ . '/../../publishable/assets/' => public_path('themes/velocity/assets'),
+        ], 'public');
     }
 
     /**

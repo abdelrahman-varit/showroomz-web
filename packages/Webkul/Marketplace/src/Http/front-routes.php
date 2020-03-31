@@ -75,7 +75,6 @@ Route::group(['middleware' => ['web', 'theme', 'locale', 'currency']], function 
                         'view' => 'marketplace::shop.sellers.account.catalog.products.index'
                     ])->name('marketplace.account.products.index');
 
-
                     // Catalog Product Routes
                     Route::get('/products/search', 'Webkul\Marketplace\Http\Controllers\Shop\Account\AssignProductController@index')->defaults('_config', [
                         'view' => 'marketplace::shop.sellers.account.catalog.products.search'

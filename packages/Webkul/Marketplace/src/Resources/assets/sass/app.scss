@@ -533,6 +533,22 @@
                             padding-right: 0;
                         }
 
+                        .product-price {
+                            span {
+                                font-size: 20px;
+                            }
+
+                            .regular-price {
+                                color: $font-light;
+                                text-decoration: line-through;
+                                margin-right: 10px;
+                            }
+
+                            .special-price {
+                                color: $disc-price;
+                            }
+                        }
+
                         .control-group {
                             width: 60px;
                             display: inline-block;

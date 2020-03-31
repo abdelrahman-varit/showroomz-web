@@ -89,7 +89,7 @@ class SellerRepository extends Repository
      */
     public function update(array $data, $id, $attribute = "id")
     {
-        Event::fire('marketplace.seller.profile.update.before', $id);
+        Event::dispatch('marketplace.seller.profile.update.before', $id);
 
         $seller = $this->find($id);
 
@@ -99,7 +99,7 @@ class SellerRepository extends Repository
 
         $this->uploadImages($data, $seller, 'banner');
 
-        Event::fire('marketplace.seller.profile.update.after', $seller);
+        Event::dispatch('marketplace.seller.profile.update.after', $seller);
 
         return $seller;
     }
@@ -197,11 +197,11 @@ class SellerRepository extends Repository
      */
     public function delete($id)
     {
-        Event::fire('marketplace.seller.delete.before', $id);
+        Event::dispatch('marketplace.seller.delete.before', $id);
 
         parent::delete($id);
 
-        Event::fire('marketplace.seller.delete.after', $id);
+        Event::dispatch('marketplace.seller.delete.after', $id);
     }
 
     /**

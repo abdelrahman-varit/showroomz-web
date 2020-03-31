@@ -1,4 +1,5 @@
 @import "icons";
+@import "variables";
 
 .navbar-left {
     width: 100px;
@@ -10,4 +11,20 @@
 
 .content-container {
     padding-left: 100px;
+}
+
+.product-price {
+    span {
+        font-size: 20px;
+    }
+
+    .regular-price {
+        color: $font-light;
+        text-decoration: line-through;
+        margin-right: 10px;
+    }
+
+    .special-price {
+        color: $disc-price;
+    }
 }

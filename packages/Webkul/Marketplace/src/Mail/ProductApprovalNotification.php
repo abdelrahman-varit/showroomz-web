@@ -16,7 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class ProductApprovalNotification extends Mailable
 {
     use Queueable, SerializesModels;
-    
+
     /**
      * The Product instance.
      *

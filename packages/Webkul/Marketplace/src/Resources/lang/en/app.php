@@ -331,6 +331,11 @@ return [
             'about-marketplace' => 'About Marketplace',
             'show-open-shop-block' => 'Show Open Shop Block',
             'open-shop-info' => 'Open Shop Information',
+            'setup-icon-1' => 'Setup Icon 1',
+            'setup-icon-2' => 'Setup Icon 2',
+            'setup-icon-3' => 'Setup Icon 3',
+            'setup-icon-4' => 'Setup Icon 4',
+            'setup-icon-5' => 'Setup Icon 5',
         ],
 
         'sellers' => [
@@ -512,8 +517,16 @@ return [
 
         'product' => [
                 'subject' => 'Product Approval Notification',
+                'disapprove-product' => 'Product Disapproval Notification',
                 'dear' => 'Dear :name',
-                'info' => 'This is to inform you that your product <b>:name</b> has been approved.'
+                'info' => 'This is to inform you that your product <b>:name</b> has been approved.',
+                'disapproved-info' => 'This is to inform you that your product <b>:name</b> has been disapproved.'
+        ]
+    ],
+
+    'velocity' => [
+        'system' => [
+            'velocity-content' => 'Velocity Content'
         ]
     ]
 ];

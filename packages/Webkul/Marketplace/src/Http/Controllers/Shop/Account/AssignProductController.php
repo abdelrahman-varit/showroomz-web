@@ -5,7 +5,7 @@ namespace Webkul\Marketplace\Http\Controllers\Shop\Account;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Webkul\Marketplace\Http\Controllers\Shop\Controller;
-use Webkul\Product\Repositories\ProductRepository as Product;
+use Webkul\Marketplace\Repositories\MpProductRepository as Product;
 use Webkul\Inventory\Repositories\InventorySourceRepository as InventorySource;
 use Webkul\Marketplace\Repositories\ProductRepository as SellerProduct;
 use Webkul\Marketplace\Repositories\SellerRepository as Seller;
@@ -53,15 +53,6 @@ class AssignProductController extends Controller
      */
     protected $seller;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @param  Webkul\Inventory\Repositories\InventorySourceRepository $inventorySource
-     * @param  Webkul\Product\Repositories\ProductRepository           $product
-     * @param  Webkul\Marketplace\Repositories\ProductRepository       $sellerProduct
-     * @param  Webkul\Marketplace\Repositories\SellerRepository        $seller
-     * @return void
-     */
     public function __construct(
         InventorySource $inventorySource,
         Product $product,
@@ -87,7 +78,7 @@ class AssignProductController extends Controller
      */
     public function index()
     {
-        if (request()->ajax()) {
+        if (request()->input('query')) {
             $results = [];
 
             foreach ($this->sellerProduct->searchProducts(request()->input('query')) as $row) {
@@ -122,6 +113,7 @@ class AssignProductController extends Controller
                         'marketplace_seller_id' => $seller->id,
                     ]);
 
+
         if ($product) {
             session()->flash('error', 'You are already selling this product..');
 
@@ -129,6 +121,12 @@ class AssignProductController extends Controller
         }
 
         $baseProduct = $this->product->find($id);
+
+        if ($baseProduct->type != "simple" && $baseProduct->type != "configurable") {
+            session()->flash('error', $baseProduct->type.' product is not allowed to sell');
+
+            return redirect()->route('marketplace.account.products.search');
+        }
 
         $inventorySources = core()->getCurrentChannel()->inventory_sources;
 

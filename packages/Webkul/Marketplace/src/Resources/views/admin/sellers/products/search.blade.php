@@ -60,7 +60,7 @@
                                             @{{ product.formated_price }}
                                         </td>
                                         <td class="last">
-                                            <a :href="['{{ route('admin.marketplace.seller.product.create', $id) }}/' + product.id ]" class="btn btn-primary btn-sm" style="color: white;">
+                                            <a :href="['{{ route('admin.marketplace.seller.product.create', $id) }}/' + product.id ]" class="btn btn-primary btn-sm" style="color: white; margin-top: -10px;">
                                                 Assign Product
                                             </a>
                                         </td>

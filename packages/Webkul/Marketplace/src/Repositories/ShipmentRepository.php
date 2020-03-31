@@ -89,7 +89,7 @@ class ShipmentRepository extends Repository
     {
         $shipment = $data['shipment'];
 
-        Event::fire('marketplace.sales.shipment.save.before', $data);
+        Event::dispatch('marketplace.sales.shipment.save.before', $data);
 
         $sellerShipments = [];
 
@@ -159,7 +159,7 @@ class ShipmentRepository extends Repository
         }
 
         foreach ($sellerShipments as $sellerShipment) {
-            Event::fire('marketplace.sales.shipment.save.after', $sellerShipment);
+            Event::dispatch('marketplace.sales.shipment.save.after', $sellerShipment);
         }
     }
 }

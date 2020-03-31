@@ -57,7 +57,7 @@ class TransactionRepository extends Repository
             return;
         }
 
-        Event::fire('marketplace.sales.transaction.create.before', $data);
+        Event::dispatch('marketplace.sales.transaction.create.before', $data);
 
         $transaction = $this->create([
                 'type' => isset($data['type']) ? $data['type'] : 'manual',
@@ -73,7 +73,7 @@ class TransactionRepository extends Repository
             $orderRepository->update(['seller_payout_status' => 'paid'], $sellerOrder->id);
         }
 
-        Event::fire('marketplace.sales.transaction.create.after', $transaction);
+        Event::dispatch('marketplace.sales.transaction.create.after', $transaction);
 
         return $transaction;
     }

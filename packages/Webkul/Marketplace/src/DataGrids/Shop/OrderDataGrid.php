@@ -48,7 +48,7 @@ class OrderDataGrid extends DataGrid
         $queryBuilder = DB::table('marketplace_orders')
                 ->leftJoin('orders', 'marketplace_orders.order_id', '=', 'orders.id')
                 ->select('orders.id', 'marketplace_orders.order_id', 'marketplace_orders.base_grand_total', 'marketplace_orders.grand_total', 'marketplace_orders.created_at', 'channel_name', 'marketplace_orders.status', 'orders.order_currency_code')
-                ->addSelect(DB::raw('CONCAT(orders.customer_first_name, " ", orders.customer_last_name) as customer_name'))
+                ->addSelect(DB::raw('CONCAT(orders.customer_first_name, " ", orders.customer_last_name) as customer_name'), 'orders.increment_id')
                 ->where('marketplace_orders.marketplace_seller_id', $seller->id);
 
         $this->addFilter('customer_name', DB::raw('CONCAT(orders.customer_first_name, " ", orders.customer_last_name)'));
@@ -64,7 +64,7 @@ class OrderDataGrid extends DataGrid
     public function addColumns()
     {
         $this->addColumn([
-            'index' => 'id',
+            'index' => 'increment_id',
             'label' => trans('marketplace::app.shop.sellers.account.sales.orders.id'),
             'type' => 'number',
             'searchable' => false,

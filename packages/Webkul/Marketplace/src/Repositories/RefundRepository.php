@@ -111,7 +111,7 @@ class RefundRepository extends Repository
     {
         $refund = $data['refund'];
 
-        Event::fire('marketplace.sales.refund.save.before', $data);
+        Event::dispatch('marketplace.sales.refund.save.before', $data);
 
         $sellerRefunds = [];
 
@@ -182,6 +182,8 @@ class RefundRepository extends Repository
         foreach ($sellers as $seller) {
             if ($seller) {
                 foreach ($this->orderRepository->findWhere(['order_id' => $refund->order->id, 'marketplace_seller_id' => $seller->id]) as $order) {
+                    $order->sellerCount = count($sellers);
+
                     $this->orderRepository->collectTotals($order);
 
                     $this->orderRepository->updateOrderStatus($order);
@@ -192,7 +194,7 @@ class RefundRepository extends Repository
         }
 
         foreach ($sellerRefunds as $sellerRefund) {
-            Event::fire('marketplace.sales.refund.save.after', $sellerRefund);
+            Event::dispatch('marketplace.sales.refund.save.after', $sellerRefund);
         }
     }
 

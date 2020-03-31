@@ -100,7 +100,7 @@ class InvoiceRepository extends Repository
     {
         $invoice = $data['invoice'];
 
-        Event::fire('marketplace.sales.invoice.save.before', $data);
+        Event::dispatch('marketplace.sales.invoice.save.before', $data);
 
         $sellerInvoices = [];
         foreach ($invoice->items()->get() as $item) {
@@ -164,6 +164,8 @@ class InvoiceRepository extends Repository
         foreach ($sellers as $seller) {
             if ($seller) {
                 foreach ($this->orderRepository->findWhere(['order_id' => $invoice->order->id, 'marketplace_seller_id' => $seller->id]) as $order) {
+                    $order->sellerCount = count($sellers);
+
                     $this->orderRepository->collectTotals($order);
 
                     $this->orderRepository->updateOrderStatus($order);
@@ -172,7 +174,7 @@ class InvoiceRepository extends Repository
         }
 
         foreach ($sellerInvoices as $sellerInvoice) {
-            Event::fire('marketplace.sales.invoice.save.after', $sellerInvoice);
+            Event::dispatch('marketplace.sales.invoice.save.after', $sellerInvoice);
         }
     }
 

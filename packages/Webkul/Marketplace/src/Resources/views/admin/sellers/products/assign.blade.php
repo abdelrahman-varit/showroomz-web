@@ -5,7 +5,6 @@
 @stop
 
 @section('content-wrapper')
-
     <div class="content" style="margin-left: 20px; margin-right: 20px;">
 
         <form method="POST" action="" enctype="multipart/form-data" @submit.prevent="onSubmit">
@@ -30,7 +29,6 @@
             <div class="account-table-content">
 
                 @csrf()
-
                 <div class="product-information" style="display: inline-flex;">
 
                     <div class="product-image">
@@ -45,9 +43,8 @@
                                 </span>
                             </a>
                         </div>
-
                         <span style="font-size: 20px;">
-                            @include ('shop::products.price', ['product' => $baseProduct])
+                                @include ('marketplace::admin.products.price', ['product' => $baseProduct])
                         </span>
                     </div>
 
