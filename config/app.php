@@ -151,7 +151,7 @@ return [
     /*
         Application Version
     */
-    'version' => env('APP_VERSION', '1.0.0'),
+    'version' => env('APP_VERSION', '1.1.0'),
 
     /**
      * Blacklisting attributes while debugging
@@ -265,6 +265,7 @@ return [
         Webkul\Rule\Providers\RuleServiceProvider::class,
         Webkul\CMS\Providers\CMSServiceProvider::class,
         Webkul\Velocity\Providers\VelocityServiceProvider::class,
+        Webkul\BookingProduct\Providers\BookingProductServiceProvider::class,
     ],
 
     /*
