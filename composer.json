@@ -103,6 +103,7 @@
         "Webkul\\CMS\\": "packages/Webkul/CMS/src",
         "Webkul\\Velocity\\": "packages/Webkul/Velocity/src",
         "Webkul\\BookingProduct\\": "packages/Webkul/BookingProduct/src",
+        "Webkul\\Marketplace\\": "packages/Webkul/Marketplace",
 
         "Showroomz\\User\\": "packages/Showroomz/User/src",
         "Showroomz\\Admin\\": "packages/Showroomz/Admin/src",
