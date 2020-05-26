@@ -32,7 +32,8 @@ return array(
 
     'paths' => array(
         storage_path('app/public'),
-        public_path('storage')
+        public_path('storage'),
+        "s3://usercontent.showroomz.co"
     ),
 
     /*
