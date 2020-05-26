@@ -50,10 +50,15 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: showroomz_php
+    restart: unless-stopped
+    tty: true
+    environment:
+      SERVICE_NAME: showroomz_web
+      SERVICE_TAGS: dev
     volumes:
       - ./:/var/www/html
     ports:
-      - "9001:9000"
+      - "9002:9000"
     networks:
       - app-network
 
