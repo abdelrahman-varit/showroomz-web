@@ -76,21 +76,5 @@ services:
     networks:
       - app-network
 
-  artisan:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: showroomz_artisan
-    volumes:
-      - ./:/var/www/html
-    depends_on:
-      - php
-      - mysql
-    working_dir: /var/www/html
-    entrypoint: ["php", '/var/www/html/artisan']
-    networks:
-      - app-network
-
-
 networks:
   app-network:
