@@ -3,6 +3,17 @@
     $comparableAttributes = $attributeRepository->findByField('is_comparable', 1);
 @endphp
 
+@push('css')
+    <style>
+        .btn-add-to-cart {
+            max-width: 130px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    </style>
+@endpush
+
 @push('scripts')
     <script type="text/x-template" id="compare-product-template">
         <section class="cart-details row no-margin col-12">
@@ -57,6 +68,7 @@
                                             <img
                                                 class="image-wrapper"
                                                 :src="product['{{ $attribute['code'] }}']"
+                                                onload="window.updateHeight ? window.updateHeight() : ''"
                                                 :onerror="`this.src='${$root.baseUrl}/vendor/webkul/ui/assets/images/product/large-product-placeholder.png'`" />
                                         </a>
                                         @break
@@ -161,6 +173,11 @@
                         this.$http.get(url, data)
                         .then(response => {
                             this.isProductListLoaded = true;
+
+                            if (response.data.products.length > 3) {
+                                $('.compare-products').css('overflow-x', 'scroll');
+                            }
+
                             this.products = response.data.products;
                         })
                         .catch(error => {

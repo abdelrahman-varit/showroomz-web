@@ -19,9 +19,10 @@
                                             {{ __('velocity::app.responsive.header.greeting', ['customer' => auth()->guard('customer')->user()->first_name]) }}
                                         </a>
                                     @endauth
+                                    
                                     <i
-                                        class="material-icons pull-right"
-                                        @click="closeDrawer()">
+                                        @click="closeDrawer()"
+                                        class="material-icons pull-right text-dark">
                                         cancel
                                     </i>
                                 </span>
@@ -53,7 +54,7 @@
                                 @endif
                             @endforeach
 
-                            <ul type="none" class="velocity-content">
+                            <ul type="none" class="velocity-content" v-if="headerContent.length > 0">
                                 <li :key="index" v-for="(content, index) in headerContent">
                                     <a
                                         class="unset"
@@ -63,7 +64,7 @@
                                 </li>
                             </ul>
 
-                            <ul type="none" class="category-wrapper">
+                            <ul type="none" class="category-wrapper" v-if="$root.sharedRootCategories.length > 0">
                                 <li v-for="(category, index) in $root.sharedRootCategories">
                                     <a class="unset" :href="`${$root.baseUrl}/${category.slug}`">
                                         <div class="category-logo">
@@ -127,18 +128,20 @@
 
                             <ul type="none" class="meta-wrapper">
                                 <li>
-                                    <div class="language-logo-wrapper">
-                                        @if ($locale->locale_image)
-                                            <img
-                                                class="language-logo"
-                                                src="{{ asset('/storage/' . $locale->locale_image) }}" />
-                                        @elseif ($locale->code == "en")
-                                            <img
-                                                class="language-logo"
-                                                src="{{ asset('/themes/velocity/assets/images/flags/en.png') }}" />
-                                        @endif
-                                    </div>
-                                    <span>{{ $locale->name }}</span>
+                                    @if ($locale)
+                                        <div class="language-logo-wrapper">
+                                            @if ($locale->locale_image)
+                                                <img
+                                                    class="language-logo"
+                                                    src="{{ asset('/storage/' . $locale->locale_image) }}" />
+                                            @elseif ($locale->code == "en")
+                                                <img
+                                                    class="language-logo"
+                                                    src="{{ asset('/themes/velocity/assets/images/flags/en.png') }}" />
+                                            @endif
+                                        </div>
+                                        <span>{{ $locale->name }}</span>
+                                    @endif
 
                                     <i
                                         class="rango-arrow-right"
@@ -181,7 +184,7 @@
 
                                 <h4 class="display-inbl">@{{ subCategory.name }}</h4>
 
-                                <i class="material-icons pull-right" @click="closeDrawer()">
+                                <i class="material-icons pull-right text-dark" @click="closeDrawer()">
                                     cancel
                                 </i>
                             </div>
@@ -193,7 +196,7 @@
 
                                     <a
                                         class="unset"
-                                        :href="`${$root.baseUrl}/${nestedSubCategory.slug}`">
+                                        :href="`${$root.baseUrl}/${subCategory.slug}/${nestedSubCategory.slug}`">
 
                                         <div class="category-logo">
                                             <img
@@ -214,7 +217,7 @@
                                             v-for="(thirdLevelCategory, index) in nestedSubCategory.children">
                                             <a
                                                 class="unset"
-                                                :href="`${$root.baseUrl}/${nestedSubCategory.slug}`">
+                                                :href="`${$root.baseUrl}/${subCategory.slug}/${nestedSubCategory.slug}/${thirdLevelCategory.slug}`">
 
                                                 <div class="category-logo">
                                                     <img
@@ -232,9 +235,9 @@
 
                         <div class="wrapper" v-else-if="languages">
                             <div class="drawer-section">
-                                <i class="rango-arrow-left fs24 text-down-4" @click="toggleSubcategories('root')"></i>
-                                <h4 class="display-inbl">Languages</h4>
-                                <i class="material-icons pull-right" @click="closeDrawer()">cancel</i>
+                                <i class="rango-arrow-left fs24 text-down-4" @click="toggleMetaInfo('languages')"></i>
+                                <h4 class="display-inbl">{{ __('velocity::app.responsive.header.languages') }}</h4>
+                                <i class="material-icons pull-right text-dark" @click="closeDrawer()">cancel</i>
                             </div>
 
                             <ul type="none">
@@ -265,9 +268,9 @@
 
                         <div class="wrapper" v-else-if="currencies">
                             <div class="drawer-section">
-                                <i class="rango-arrow-left fs24 text-down-4" @click="toggleSubcategories('root')"></i>
+                                <i class="rango-arrow-left fs24 text-down-4" @click="toggleMetaInfo('currencies')"></i>
                                 <h4 class="display-inbl">Currencies</h4>
-                                <i class="material-icons pull-right" @click="closeDrawer()">cancel</i>
+                                <i class="material-icons pull-right text-dark" @click="closeDrawer()">cancel</i>
                             </div>
 
                             <ul type="none">
@@ -328,18 +331,9 @@
                         <i class="material-icons">search</i>
                     </a>
 
-                    @php
-                        $cart = cart()->getCart();
-
-                        $cartItemsCount = trans('shop::app.minicart.zero');
-                        if ($cart) {
-                            $cartItemsCount = $cart->items->count();
-                        }
-                    @endphp
-
                     <a href="{{ route('shop.checkout.cart.index') }}" class="unset">
                         <div class="badge-wrapper">
-                            <span class="badge">{{ $cartItemsCount }}</span>
+                            <span class="badge">@{{ cartItemsCount }}</span>
                         </div>
                         <i class="material-icons text-down-3">shopping_cart</i>
                     </a>
@@ -379,6 +373,16 @@
     </header>
 </script>
 
+@php
+    $cart = cart()->getCart();
+
+    $cartItemsCount = trans('shop::app.minicart.zero');
+
+    if ($cart) {
+        $cartItemsCount = $cart->items->count();
+    }
+@endphp
+
 <script type="text/javascript">
     (() => {
         Vue.component('content-header', {
@@ -398,6 +402,7 @@
                     'subCategory': null,
                     'isSearchbar': false,
                     'rootCategories': true,
+                    'cartItemsCount': '{{ $cartItemsCount }}',
                     'isCustomer': '{{ auth()->guard('customer')->user() ? "true" : "false" }}' == "true",
                 }
             },
@@ -413,10 +418,15 @@
 
                 '$root.headerItemsCount': function () {
                     this.updateHeaderItemsCount();
+                },
+
+                '$root.miniCartKey': function () {
+                    this.getMiniCartDetails();
                 }
             },
 
             created: function () {
+                this.getMiniCartDetails();
                 this.updateHeaderItemsCount();
             },
 
@@ -450,6 +460,7 @@
                 toggleSubcategories: function (index, event) {
                     if (index == "root") {
                         this.rootCategories = true;
+                        this.subCategory = false;
                     } else {
                         event.preventDefault();
 
@@ -460,7 +471,8 @@
                 },
 
                 toggleMetaInfo: function (metaKey) {
-                    this.rootCategories = false;
+                    this.rootCategories = ! this.rootCategories;
+                    
                     this[metaKey] = !this[metaKey];
                 },
 
@@ -486,7 +498,19 @@
                                 console.log(this.__('error.something_went_wrong'));
                             });
                     }
-                }
+                },
+
+                getMiniCartDetails: function () {
+                    this.$http.get(`${this.$root.baseUrl}/mini-cart`)
+                    .then(response => {
+                        if (response.data.status) {
+                            this.cartItemsCount = response.data.mini_cart.cart_items.length;
+                        }
+                    })
+                    .catch(exception => {
+                        console.log(this.__('error.something_went_wrong'));
+                    });
+                },
             },
         });
     })()

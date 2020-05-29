@@ -110,12 +110,14 @@ class Helper extends Review
         foreach ($orderItems as $key => $orderItem) {
             $products[] = $orderItem->product;
 
-            $this->orderBrandsRepository->create([
-                'order_item_id' => $orderItem->id,
-                'order_id'      => $orderItem->order_id,
-                'product_id'    => $orderItem->product_id,
-                'brand'         => $products[$key]->brand,
-            ]);
+            try {
+                $this->orderBrandsRepository->create([
+                    'order_item_id' => $orderItem->id,
+                    'order_id'      => $orderItem->order_id,
+                    'product_id'    => $orderItem->product_id,
+                    'brand'         => $products[$key]->brand,
+                ]);
+            } catch(\Exception $exception) {}
         }
     }
 
@@ -252,9 +254,13 @@ class Helper extends Review
 
         if (is_string($path) && is_readable($path)) {
             return include $path;
-        }
+        } else {
+            $currentLocale = "en";
 
-        return [];
+            $path = __DIR__ . "/../Resources/lang/$currentLocale/app.php";
+
+            return include $path;
+        }
     }
 
     /**
@@ -318,6 +324,7 @@ class Helper extends Review
             'shortDescription'  => $product->short_description,
             'firstReviewText'   => trans('velocity::app.products.be-first-review'),
             'priceHTML'         => view('shop::products.price', ['product' => $product])->render(),
+            'defaultAddToCart'  => view('shop::products.add-buttons', ['product' => $product])->render(),
             'addToCartHtml'     => view('shop::products.add-to-cart', [
                 'showCompare'       => true,
                 'product'           => $product,
@@ -363,6 +370,7 @@ class Helper extends Review
                     $productMetaDetails['priceHTML'] = $formattedProduct['priceHTML'];
                     $productMetaDetails['addToCartHtml'] = $formattedProduct['addToCartHtml'];
                     $productMetaDetails['galleryImages'] = $formattedProduct['galleryImages'];
+                    $productMetaDetails['defaultAddToCart'] = $formattedProduct['defaultAddToCart'];
 
                     $product = array_merge($productFlat->toArray(), $productMetaDetails);
 
