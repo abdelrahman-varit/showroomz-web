@@ -1,43 +1,43 @@
 # Dockerfile
-FROM php:7.2-fpm
+FROM php:7.3-fpm-alpine
 
 LABEL maintainer="mwfayez@gmail.com"
 LABEL service="showroomz"
 
 # Set working directory
-WORKDIR /var/www/html
 
-# Install dependencies && extensions
-RUN apt-get -qq update && apt-get -qq install -y \
-    build-essential \
+WORKDIR /var/www
+
+RUN apk update && apk add \
+    build-base \
+    freetype-dev \
+    libjpeg-turbo-dev \
     libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libicu-dev \
-    locales \
+    libzip-dev \
     zip \
     jpegoptim optipng pngquant gifsicle \
+    vim \
     unzip \
-    curl  > /dev/null \
-    && docker-php-ext-configure intl > /dev/null \
-    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl intl > /dev/null \
-    && docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ > /dev/null \
-    && docker-php-ext-install gd > /dev/null \
-    && apt-get -qq clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    git \
+    curl
 
-# Install redis
-RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/5.2.2.tar.gz \
-    && tar xfz /tmp/redis.tar.gz \
-    && rm -r /tmp/redis.tar.gz \
-    && mkdir -p /usr/src/php/ext \
-    && mv phpredis-* /usr/src/php/ext/redis \
-    && docker-php-ext-install redis > /dev/null \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
+RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
+RUN docker-php-ext-install gd
 
-# Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+# Install Redis Extension
+RUN apk add autoconf && pecl install -o -f redis \
+&&  rm -rf /tmp/pear \
+&&  docker-php-ext-enable redis && apk del autoconf
 
-# Change current user to www
+# Copy config
+# COPY ./docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
+
+RUN addgroup -g 1000 -S www && \
+    adduser -u 1000 -S www -G www
+
 USER www
+
+COPY --chown=www:www . /var/www
+
+EXPOSE 9000
