@@ -34,7 +34,7 @@ class EventServiceProvider extends ServiceProvider
             $viewRenderEventManager->addTemplate('marketplace::admin.layouts.style');
         });
 
-        if ( (core()->getCurrentChannel() && core()->getCurrentChannel()->theme == "velocity")) {
+        if ( 1 || (core()->getCurrentChannel() && core()->getCurrentChannel()->theme == "velocity")) {
             Event::listen('bagisto.shop.layout.head', function($viewRenderEventManager) {
                 $viewRenderEventManager->addTemplate('marketplace::shop.velocity.layouts.style');
             });
