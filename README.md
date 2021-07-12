@@ -1,4 +1,4 @@
-<p align="center"><img src="https://showroomz.s3.eu-central-1.amazonaws.com/logo.png" width="250px"></p>
+<p align="center"><img src="https://avatars.githubusercontent.com/u/65683048?s=400&u=b04b518472ac78521f8f92deef68c67ab8fe3504&v=4" width="250px"></p>
 
 
 
