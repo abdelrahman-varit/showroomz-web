@@ -12,7 +12,11 @@ class Currency extends Model implements CurrencyContract
      *
      * @var array
      */
-    protected $fillable = ['code', 'name', 'symbol'];
+    protected $fillable = [
+        'code',
+        'name',
+        'symbol',
+    ];
 
     /**
      * Set currency code in capital
@@ -26,9 +30,9 @@ class Currency extends Model implements CurrencyContract
     }
 
     /**
-     * Get the currency_exchange associated with the currency.
+     * Get the exchange rate associated with the currency.
      */
-    public function CurrencyExchangeRate()
+    public function exchange_rate()
     {
         return $this->hasOne(CurrencyExchangeRateProxy::modelClass(), 'target_currency');
     }

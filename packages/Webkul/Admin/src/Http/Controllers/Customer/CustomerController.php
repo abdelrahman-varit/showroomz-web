@@ -2,6 +2,7 @@
 
 namespace Webkul\Admin\Http\Controllers\Customer;
 
+use Illuminate\Support\Facades\Event;
 use Webkul\Admin\Http\Controllers\Controller;
 use Webkul\Customer\Repositories\CustomerRepository;
 use Webkul\Customer\Repositories\CustomerGroupRepository;
@@ -9,12 +10,6 @@ use Webkul\Core\Repositories\ChannelRepository;
 use Webkul\Admin\Mail\NewCustomerNotification;
 use Mail;
 
-/**
- * Customer controlller
- *
- * @author    Rahul Shukla <rahulshukla.symfony517@webkul.com>
- * @copyright 2018 Webkul Software Pvt Ltd (http://www.webkul.com)
- */
 class CustomerController extends Controller
 {
     /**
@@ -27,30 +22,30 @@ class CustomerController extends Controller
     /**
      * CustomerRepository object
      *
-     * @var array
+     * @var \Webkul\Customer\Repositories\CustomerRepository
      */
     protected $customerRepository;
 
     /**
      * CustomerGroupRepository object
      *
-     * @var array
+     * @var \Webkul\Customer\Repositories\CustomerGroupRepository
      */
     protected $customerGroupRepository;
 
     /**
      * ChannelRepository object
      *
-     * @var array
+     * @var \Webkul\Core\Repositories\ChannelRepository
      */
     protected $channelRepository;
 
     /**
      * Create a new controller instance.
      *
-     * @param \Webkul\Customer\Repositories\CustomerRepository      $customerRepository
-     * @param \Webkul\Customer\Repositories\CustomerGroupRepository $customerGroupRepository
-     * @param \Webkul\Core\Repositories\ChannelRepository           $channelRepository
+     * @param \Webkul\Customer\Repositories\CustomerRepository  $customerRepository
+     * @param \Webkul\Customer\Repositories\CustomerGroupRepository  $customerGroupRepository
+     * @param \Webkul\Core\Repositories\ChannelRepository  $channelRepository
      */
     public function __construct(
         CustomerRepository $customerRepository,
@@ -117,7 +112,11 @@ class CustomerController extends Controller
 
         $data['is_verified'] = 1;
 
+        Event::dispatch('customer.registration.before');
+
         $customer = $this->customerRepository->create($data);
+
+        Event::dispatch('customer.registration.after', $customer);
 
         try {
             $configKey = 'emails.general.notifications.emails.general.notifications.customer';
@@ -136,8 +135,7 @@ class CustomerController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\View\View
      */
     public function edit($id)
@@ -154,8 +152,7 @@ class CustomerController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function update($id)
@@ -172,7 +169,11 @@ class CustomerController extends Controller
 
         $data['status'] = ! isset($data['status']) ? 0 : 1;
 
-        $this->customerRepository->update($data, $id);
+        Event::dispatch('customer.update.before');
+
+        $customer = $this->customerRepository->update($data, $id);
+
+        Event::dispatch('customer.update.after', $customer);
 
         session()->flash('success', trans('admin::app.response.update-success', ['name' => 'Customer']));
 
@@ -182,8 +183,7 @@ class CustomerController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
-     *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -206,6 +206,7 @@ class CustomerController extends Controller
     /**
      * To load the note taking screen for the customers
      *
+     * @param  int  $id
      * @return \Illuminate\View\View
      */
     public function createNote($id)
@@ -218,7 +219,7 @@ class CustomerController extends Controller
     /**
      * To store the response of the note in storage
      *
-     * @return redirect
+     * @return \Illuminate\Http\Response
      */
     public function storeNote()
     {
@@ -228,9 +229,7 @@ class CustomerController extends Controller
 
         $customer = $this->customerRepository->find(request()->input('_customer'));
 
-        $noteTaken = $customer->update([
-            'notes' => request()->input('notes'),
-        ]);
+        $noteTaken = $customer->update(['notes' => request()->input('notes')]);
 
         if ($noteTaken) {
             session()->flash('success', 'Note taken');
@@ -244,7 +243,7 @@ class CustomerController extends Controller
     /**
      * To mass update the customer
      *
-     * @return redirect
+     * @return \Illuminate\Http\Response
      */
     public function massUpdate()
     {
@@ -254,9 +253,7 @@ class CustomerController extends Controller
         foreach ($customerIds as $customerId) {
             $customer = $this->customerRepository->find($customerId);
 
-            $customer->update([
-                'status' => $updateOption,
-            ]);
+            $customer->update(['status' => $updateOption]);
         }
 
         session()->flash('success', trans('admin::app.customers.customers.mass-update-success'));
@@ -267,16 +264,14 @@ class CustomerController extends Controller
     /**
      * To mass delete the customer
      *
-     * @return redirect
+     * @return \Illuminate\Http\Response
      */
     public function massDestroy()
     {
         $customerIds = explode(',', request()->input('indexes'));
 
         foreach ($customerIds as $customerId) {
-            $this->customerRepository->deleteWhere([
-                'id' => $customerId,
-            ]);
+            $this->customerRepository->deleteWhere(['id' => $customerId]);
         }
 
         session()->flash('success', trans('admin::app.customers.customers.mass-destroy-success'));

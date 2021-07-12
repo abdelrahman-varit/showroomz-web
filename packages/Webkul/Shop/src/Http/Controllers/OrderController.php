@@ -6,34 +6,27 @@ use Webkul\Sales\Repositories\OrderRepository;
 use Webkul\Sales\Repositories\InvoiceRepository;
 use PDF;
 
-/**
- * Customer controlller for the customer basically for the tasks of customers
- * which will be done after customer authenticastion.
- *
- * @author    Prashant Singh <prashant.singh852@webkul.com>
- * @copyright 2018 Webkul Software Pvt Ltd (http://www.webkul.com)
- */
 class OrderController extends Controller
 {
     /**
      * OrderrRepository object
      *
-     * @var Object
+     * @var \Webkul\Sales\Repositories\OrderRepository
      */
     protected $orderRepository;
 
     /**
      * InvoiceRepository object
      *
-     * @var Object
+     * @var \Webkul\Sales\Repositories\InvoiceRepository
      */
     protected $invoiceRepository;
 
     /**
      * Create a new controller instance.
      *
-     * @param  \Webkul\Order\Repositories\OrderRepository   $orderRepository
-     * @param  \Webkul\Order\Repositories\InvoiceRepository $invoiceRepository
+     * @param  \Webkul\Order\Repositories\OrderRepository  $orderRepository
+     * @param  \Webkul\Order\Repositories\InvoiceRepository  $invoiceRepository
      * @return void
      */
     public function __construct(
@@ -70,11 +63,12 @@ class OrderController extends Controller
     {
         $order = $this->orderRepository->findOneWhere([
             'customer_id' => auth()->guard('customer')->user()->id,
-            'id' => $id
+            'id'          => $id,
         ]);
 
-        if (! $order)
+        if (! $order) {
             abort(404);
+        }
 
         return view($this->_config['view'], compact('order'));
     }
@@ -92,5 +86,24 @@ class OrderController extends Controller
         $pdf = PDF::loadView('shop::customers.account.orders.pdf', compact('invoice'))->setPaper('a4');
 
         return $pdf->download('invoice-' . $invoice->created_at->format('d-m-Y') . '.pdf');
+    }
+
+    /**
+     * Cancel action for the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function cancel($id)
+    {
+        $result = $this->orderRepository->cancel($id);
+
+        if ($result) {
+            session()->flash('success', trans('admin::app.response.cancel-success', ['name' => 'Order']));
+        } else {
+            session()->flash('error', trans('admin::app.response.cancel-error', ['name' => 'Order']));
+        }
+
+        return redirect()->back();
     }
 }

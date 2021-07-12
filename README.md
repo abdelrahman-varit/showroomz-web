@@ -13,15 +13,19 @@ Showroomz is build by Laravel framework, so please check the official laravel in
 
 Clone the repository
 
-    git clone https://github.com/minawilliam/showroomz-web.git
+    git clone https://github.com/showroomz/showroomz-web.git
 
 Switch to the repo folder
 
     cd showroomz-web
 
+Build and run the docker containers
+
+    docker-compose up -d --build
+
 Install all the dependencies using composer
 
-    composer install
+    docker-compose composer install
 
 Copy the example env file and make the required configuration changes in the .env file
 
@@ -29,35 +33,33 @@ Copy the example env file and make the required configuration changes in the .en
 
 Generate a new application key
 
-    php artisan key:generate
+    docker-compose artisan key:generate
 
 Publish assets and configurations
 
-    php artisan vendor:publish
+    docker-compose artisan vendor:publish
     -> Press 0 and then press enter to publish all assets and configurations.
 
 Run the database migrations (**Set the database connection in .env before migrating**)
 
-    php artisan migrate --seed
+    docker-compose artisan migrate --seed
 
-Start the local development server
 
-    php artisan serve
-
-You can now access the server at http://localhost:8000
+You can now access the server at http://localhost:8080
 
 **TL;DR command list**
 
-    git clone https://github.com/minawilliam/showroomz-web.git
+    git clone https://github.com/showroomz/showroomz-web.git
     cd showroomz-web
-    composer install
+    docker-compose up -d --build
+    docker-compose composer install
     cp .env.example .env
-    php artisan key:generate
+    docker-compose artisan key:generate
     
 **Make sure you set the correct database connection information before running the migrations** [Environment variables](#environment-variables)
 
-    php artisan migrate --seed
-    php artisan serve
-    php artisan vendor:publish
+    docker-compose artisan migrate --seed
+    docker-compose artisan serve
+    docker-compose artisan vendor:publish
     -> Press 0 and then press enter to publish all assets and configurations.
 

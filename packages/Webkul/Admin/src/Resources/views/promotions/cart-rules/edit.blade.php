@@ -56,7 +56,7 @@
 
                                 <div class="control-group">
                                     <label for="status">{{ __('admin::app.promotions.cart-rules.status') }}</label>
-                                    
+
                                     <label class="switch">
                                         <input type="checkbox" id="status" name="status" value="{{ $cartRule->status }}" {{ $cartRule->status ? 'checked' : '' }}>
                                         <span class="slider round"></span>
@@ -144,16 +144,16 @@
 
                                 <div class="control-group date">
                                     <label for="starts_from">{{ __('admin::app.promotions.cart-rules.from') }}</label>
-                                    <date>
+                                    <datetime>
                                         <input type="text" name="starts_from" class="control" value="{{ old('starts_from') ?: $cartRule->starts_from }}"/>
-                                    </date>
+                                    </datetime>
                                 </div>
 
                                 <div class="control-group date">
                                     <label for="ends_till">{{ __('admin::app.promotions.cart-rules.to') }}</label>
-                                    <date>
+                                    <datetime>
                                         <input type="text" name="ends_till" class="control" value="{{ old('ends_till') ?: $cartRule->ends_till }}"/>
-                                    </date>
+                                    </datetime>
                                 </div>
 
                                 <div class="control-group">
@@ -535,10 +535,10 @@
                                 'operator': '<=',
                                 'label': '{{ __('admin::app.promotions.cart-rules.equals-or-less-than') }}'
                             }, {
-                                'operator': '<=',
+                                'operator': '>',
                                 'label': '{{ __('admin::app.promotions.cart-rules.greater-than') }}'
                             }, {
-                                'operator': '<=',
+                                'operator': '<',
                                 'label': '{{ __('admin::app.promotions.cart-rules.less-than') }}'
                             }],
                         'decimal': [{
